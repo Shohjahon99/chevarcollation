@@ -1,5 +1,5 @@
-const BOT_TOKEN = (import.meta.env.VITE_TELEGRAM_BOT_TOKEN as string)?.trim();
-const CHAT_ID = (import.meta.env.VITE_TELEGRAM_CHAT_ID as string)?.trim();
+const BOT_TOKEN = (import.meta.env.VITE_TELEGRAM_BOT_TOKEN as string)?.replace(/[^\x20-\x7E]/g, '').trim();
+const CHAT_ID = (import.meta.env.VITE_TELEGRAM_CHAT_ID as string)?.replace(/[^\x20-\x7E]/g, '').trim();
 
 export async function sendOrderNotification(order: {
   fullName: string;
