@@ -84,6 +84,15 @@ export default function Admin() {
     setImagePreview(URL.createObjectURL(file));
   }
 
+  function toBase64(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result as string);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
   async function handleAdd(e: React.FormEvent) {
     e.preventDefault();
     setAddError("");
@@ -92,18 +101,13 @@ export default function Admin() {
 
     let image_url = "";
     if (imageFile) {
-      const ext = imageFile.name.split(".").pop();
-      const fileName = `${Date.now()}.${ext}`;
-      const { error: uploadError } = await supabase.storage
-        .from("chevarcollation")
-        .upload(fileName, imageFile, { upsert: true });
-      if (uploadError) {
-        setAddError(`Rasm yuklashda xatolik: ${uploadError.message}`);
+      try {
+        image_url = await toBase64(imageFile);
+      } catch {
+        setAddError("Rasm o'qishda xatolik");
         setSaving(false);
         return;
       }
-      const { data: urlData } = supabase.storage.from("chevarcollation").getPublicUrl(fileName);
-      image_url = urlData.publicUrl;
     }
 
     const { error } = await supabase.from("products").insert([{
