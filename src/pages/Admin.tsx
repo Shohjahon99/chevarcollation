@@ -95,14 +95,14 @@ export default function Admin() {
       const ext = imageFile.name.split(".").pop();
       const fileName = `${Date.now()}.${ext}`;
       const { error: uploadError } = await supabase.storage
-        .from("products")
+        .from("chevarcollation")
         .upload(fileName, imageFile, { upsert: true });
       if (uploadError) {
         setAddError(`Rasm yuklashda xatolik: ${uploadError.message}`);
         setSaving(false);
         return;
       }
-      const { data: urlData } = supabase.storage.from("products").getPublicUrl(fileName);
+      const { data: urlData } = supabase.storage.from("chevarcollation").getPublicUrl(fileName);
       image_url = urlData.publicUrl;
     }
 
