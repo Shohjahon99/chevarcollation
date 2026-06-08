@@ -31,15 +31,15 @@ export default function OrderModal({ open, onClose }: Props) {
   const handleSubmit = async () => {
     if (!validate()) return;
     setStatus('loading');
-    try {
-      const orderItems = items.map(i => ({
-        productId: i.productId,
-        quantity: i.quantity,
-        name: i.name,
-        price: i.price,
-      }));
+    const orderItems = items.map(i => ({
+      productId: i.productId,
+      quantity: i.quantity,
+      name: i.name,
+      price: i.price,
+    }));
 
-      // Telegram avval (asosiy kanal)
+    // Telegram (xato bo'lsa ham davom etadi)
+    try {
       await sendOrderNotification({
         fullName: form.fullName.trim(),
         phone: form.phone.trim(),
@@ -47,28 +47,26 @@ export default function OrderModal({ open, onClose }: Props) {
         totalPrice,
         items: orderItems,
       });
+    } catch { /* ignore */ }
 
-      // Supabase ga saqlash (fail bo'lsa ham davom etadi)
-      try {
-        await submitOrder({
-          fullName: form.fullName.trim(),
-          phone: form.phone.trim(),
-          note: form.note.trim(),
-          totalPrice,
-          items: orderItems,
-        });
-      } catch { /* Telegram ga ketdi */ }
+    // Supabase (xato bo'lsa ham davom etadi)
+    try {
+      await submitOrder({
+        fullName: form.fullName.trim(),
+        phone: form.phone.trim(),
+        note: form.note.trim(),
+        totalPrice,
+        items: orderItems,
+      });
+    } catch { /* ignore */ }
 
-      setStatus('success');
-      clearCart();
-      setTimeout(() => {
-        onClose();
-        setStatus('idle');
-        setForm({ fullName: '', phone: '', note: '' });
-      }, 2500);
-    } catch {
-      setStatus('error');
-    }
+    setStatus('success');
+    clearCart();
+    setTimeout(() => {
+      onClose();
+      setStatus('idle');
+      setForm({ fullName: '', phone: '', note: '' });
+    }, 2500);
   };
 
   const inputClass = (field: string) =>
