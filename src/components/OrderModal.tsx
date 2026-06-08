@@ -39,14 +39,7 @@ export default function OrderModal({ open, onClose }: Props) {
         price: i.price,
       }));
 
-      await submitOrder({
-        fullName: form.fullName.trim(),
-        phone: form.phone.trim(),
-        note: form.note.trim(),
-        totalPrice,
-        items: orderItems,
-      });
-
+      // Telegram avval (asosiy kanal)
       await sendOrderNotification({
         fullName: form.fullName.trim(),
         phone: form.phone.trim(),
@@ -54,6 +47,17 @@ export default function OrderModal({ open, onClose }: Props) {
         totalPrice,
         items: orderItems,
       });
+
+      // Supabase ga saqlash (fail bo'lsa ham davom etadi)
+      try {
+        await submitOrder({
+          fullName: form.fullName.trim(),
+          phone: form.phone.trim(),
+          note: form.note.trim(),
+          totalPrice,
+          items: orderItems,
+        });
+      } catch { /* Telegram ga ketdi */ }
 
       setStatus('success');
       clearCart();
