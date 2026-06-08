@@ -1,5 +1,5 @@
-const BOT_TOKEN = import.meta.env.VITE_TELEGRAM_BOT_TOKEN as string;
-const CHAT_ID = import.meta.env.VITE_TELEGRAM_CHAT_ID as string;
+const BOT_TOKEN = (import.meta.env.VITE_TELEGRAM_BOT_TOKEN as string)?.trim();
+const CHAT_ID = (import.meta.env.VITE_TELEGRAM_CHAT_ID as string)?.trim();
 
 export async function sendOrderNotification(order: {
   fullName: string;
@@ -23,7 +23,8 @@ export async function sendOrderNotification(order: {
     `💰 <b>Jami summa:</b> ${order.totalPrice.toLocaleString()} so'm` +
     (order.note ? `\n\n💬 <b>Izoh:</b> ${order.note}` : "");
 
-  await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
+  console.log('Telegram sending to:', CHAT_ID, 'token starts:', BOT_TOKEN?.slice(0, 10));
+  const res = await fetch(`https://api.telegram.org/bot${BOT_TOKEN}/sendMessage`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({
@@ -32,4 +33,7 @@ export async function sendOrderNotification(order: {
       parse_mode: "HTML",
     }),
   });
+  const json = await res.json();
+  console.log('Telegram response:', json);
+  if (!res.ok) throw new Error(JSON.stringify(json));
 }

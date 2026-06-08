@@ -47,7 +47,7 @@ export default function OrderModal({ open, onClose }: Props) {
         totalPrice,
         items: orderItems,
       });
-    } catch { /* ignore */ }
+    } catch (e) { console.error('Telegram error:', e); }
 
     // Supabase (xato bo'lsa ham davom etadi)
     try {
